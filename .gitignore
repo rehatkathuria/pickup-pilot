@@ -1,0 +1,11 @@
+.build/
+.swiftpm/
+/work/
+/outputs/
+/HANDOFF_PROMPT.md
+.DS_Store
+*.profraw
+*.profdata
+.env
+.env.*
+!.env.example

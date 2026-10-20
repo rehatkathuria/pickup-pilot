@@ -1,0 +1,17 @@
+# Pickup Pilot security boundaries
+
+Production checkout uses Safari’s public Apple Events interface and a normal Safari window created for one checkout driver. Pickup Pilot tracks that window by its native identifier, requires exactly one tab, and does not select, read or reuse the user’s other Safari tabs. Canceling invalidates in-flight results. Ending a review-only test detaches its old window synchronously before closing it so a late cleanup cannot target a new test window.
+
+Safari owns its normal website cookies and account session. The app does not import, export, restore or erase those cookies. A new checkout window can share Safari’s existing Apple website session; it is not a private session. Resetting the tracked window does not sign out of Apple or clear Safari website data. Legacy embedded-browser session records are not restored into Safari.
+
+Contact, billing, payment/CVV and search-location profile values remain app-scoped Keychain data. The purchase journal has a separate Keychain record. Ordinary preferences do not contain these values. Editable profile fields are intentionally visible in the local app. Development tests use synthetic values, and real credentials or card details must never appear in chat, logs, reports or fixture output.
+
+AppleScript source and transient form values are passed to the helper over a private pipe, not command-line arguments or script files. Transport failures map to fixed errors without echoing raw AppleScript error text or page contents. Displayed checkout diagnostics contain only fixed classifications and numeric statuses, not full URLs, query tokens, headers, cookies, responses or profile fields. Safari Apple Events do not expose main-document HTTP statuses; the app never invents one from page text.
+
+Automatic actions require a trusted Apple HTTPS document, current country and document identity. Guest checkout is mandatory; unavailable guest checkout, security challenges and ambiguous results stop preparation rather than triggering sign-in, repeated dispatch or challenge bypass. The app uses ordinary page controls and does not spoof a person or hide an access response. HTTP 541 does not by itself establish Apple’s reason for refusing a request.
+
+Arming requires confirmation of frozen product/store/budget/schedule limits. Final payment confirmation stays bound to the verified review and current payment state. A durable submitting journal precedes the single-use final action. Confirmed or uncertain submission prevents retries across restarts; reconciliation never clicks the final action again.
+
+Review-only preparation has no submission API and its page adapter rejects final submission before any transport command. Safari does not provide a document-start injection boundary through this integration, so the app cannot guarantee Safari’s own manual Place Order control is always disabled. The review-only screen explicitly tells the user not to place the order in Safari. Embedded WebKit fixtures retain their earlier document-start guards for regression testing; that capability is not attributed to production Safari.
+
+macOS Automation permission and Safari’s Allow JavaScript from Apple Events setting are user-controlled prerequisites. Pickup Pilot reports missing access and stops; it does not change browser or system security settings. See [DEVELOPMENT.md](DEVELOPMENT.md) for verification scope and [validation notes](docs/VALIDATION.md) for the exact tested build evidence.
