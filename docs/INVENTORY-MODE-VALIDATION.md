@@ -1,0 +1,18 @@
+# Inventory mode validation — October 20, 2026
+
+The production app has one **Apple Store inventory** window. It automatically observes all saved selected configurations on launch and applies selection changes without Start or Stop controls. **Configurations** opens a persistent checkbox popover supporting multiple selections, Select all and Clear selection. The headphone adapter is temporarily removed from inventory mode; saved adapter setups migrate to the phone catalog while preserving phone selections and search location. Checkout windows and commands are absent, and model entry points refuse checkout, Safari opening and checkout-profile access. Existing checkout records remain untouched.
+
+- Debug: **604 tests in 46 suites passed**, serial execution, 69.591 seconds. All four native inventory rendering tests also passed separately.
+- Release: build and packaging passed. Release-configuration tests were not rerun.
+- The clean release bundle, extracted ZIP and installed `/Applications/Pickup Pilot.app` passed strict signature verification. Installed file hashes match the archive.
+- Canonical source, tests and scripts match the isolated build snapshot. No commit or GitHub publication was performed for this change.
+- Synthetic checks cover one-second defaults and cadence, non-overlapping requests, interval edits, cancellation, all nearby stores, inventory deltas, missing/duplicate responses, error backoff, permission buffering, local notification content, sound/badge requests, Dock attention and notification navigation.
+- New lifecycle coverage verifies automatic launch observation, editable selections, empty selection, country/product/location changes, draining canceled requests, startup surviving cancellation of its window task, observation before slow travel estimates finish, and observation continuing while notification permission is pending. Initial discovery is reused without a duplicate request; an initial inventory failure preserves its retry backoff.
+- Multi-selection coverage verifies atomic persistence and batching, clearing, the 20-configuration limit, rejecting invalid or duplicate identities without partial changes, adapter migration, preserving location and existing phone choices, and rapid edits observing only the final selected set. The picker was rendered with two checked configurations and one unchecked configuration, full names/SKUs, and no adapter; native accessibility press automation was not verified.
+- The single map surface was rendered and checked for the absence of Start, Stop and overview controls. The unchanged map annotation components retain prior native MapKit rendering verification: valid visible frames and direct inventory-badge/pin captures, because parent offscreen bitmaps omit MapKit's hosted annotations and controls.
+
+Live Apple polling and actual system notification/sound delivery were not tested. Those depend on the current Apple service and the user's macOS notification/Focus settings. No real checkout or order was performed.
+
+The requested healthy polling cadence is one second by default, adjustable from 1–3,600 seconds. Slow requests and server backoff can make actual checks slower. Badges represent eligible configurations, not physical unit counts.
+
+The installed app was replaced on disk while the existing process was left running. Quit and reopen Pickup Pilot once to load this update; saved selections are then observed automatically. Closing its window keeps observation running in the menu bar. Use the installed app or the metadata-free ZIP: the synced Documents folder can add Finder metadata to a copied `.app` bundle.
